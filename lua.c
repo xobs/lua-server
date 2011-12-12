@@ -421,11 +421,11 @@ nlua_stdio(FCGX_Request *request, char *enc, int id, int timeout)
         char bfr[8192];
         int bytes_read, bytes_written;
 
+        FCGX_FPrintF(request->out, "Content-Type: text/html\r\n\r\n");
         while ( (bytes_read = FCGX_GetStr(bfr, sizeof(bfr), request->in)) > 0) {
             char *left = bfr;
 
-            write(STDOUT_FILENO, bfr, bytes_read);
-            if (enc && !strcmp(enc, "hex")) {
+            if (enc && (!strcmp(enc, "hex") || !strcmp(enc, "hexecho"))) {
                 char *s = bfr;
                 int input=0, output=0;
                 while (input < bytes_read) {
@@ -438,6 +438,9 @@ nlua_stdio(FCGX_Request *request, char *enc, int id, int timeout)
                 bytes_read /= 2;
             }
 
+            if (!strcmp(enc, "hexecho") || !strcmp(enc, "echo")) 
+                FCGX_PutStr(bfr, bytes_read, request->out);
+
             while (bytes_read > 0) {
                 bytes_written = write(nlua_states[id].in_fd, left, bytes_read);
                 if (bytes_written < 0) {
@@ -448,7 +451,6 @@ nlua_stdio(FCGX_Request *request, char *enc, int id, int timeout)
                 bytes_read -= bytes_written;
             }
         }
-        FCGX_FPrintF(request->out, "Content-Type: text/html\r\n\r\n");
     }
 
     /* If it's not a POST, then read from stdout / stderr */
