@@ -9,7 +9,7 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <sys/stat.h>
-
+#include <unistd.h>
 
 /* plugin config for all request/connections */
 
@@ -330,7 +330,6 @@ handle_file_uri(FCGX_Request *request)
         FCGX_FPrintF(request->out, "Content-Type: text/html\r\n"
                                    "\r\n");
         while ((de = readdir(proj_dir)) != NULL) {
-            char entry[2048];
 
             /* Only accept files */
             if ((de->d_type != DT_DIR)) {
@@ -392,7 +391,6 @@ handle_file_uri(FCGX_Request *request)
         FCGX_FPrintF(request->out, "Content-Type: text/html\r\n"
                                    "\r\n");
         while ((de = readdir(proj_dir)) != NULL) {
-            char entry[2048];
 
             /* Only accept files */
             if (!strcmp(de->d_name, ".") || !strcmp(de->d_name, ".."))

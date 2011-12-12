@@ -40,7 +40,6 @@ static void *
 request_thread(void *s_ptr)
 {
     int rc;
-    int counter = 0;
     FCGX_Request request;
 
     if (FCGX_InitRequest(&request, *((int *)s_ptr), 0)) {
@@ -50,8 +49,7 @@ request_thread(void *s_ptr)
 
     while (1) {
         static pthread_mutex_t accept_mutex = PTHREAD_MUTEX_INITIALIZER;
-        static pthread_mutex_t counts_mutex = PTHREAD_MUTEX_INITIALIZER;
-        char *uri;
+        //static pthread_mutex_t counts_mutex = PTHREAD_MUTEX_INITIALIZER;
 
         pthread_mutex_lock(&accept_mutex);
         rc = FCGX_Accept_r(&request);
