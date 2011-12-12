@@ -3,14 +3,37 @@
 #include <fcgiapp.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <string.h>
 
 #define FCGI_SOCKET "/tmp/lua.socket"
 #define THREAD_COUNT 20
 
+int handle_file_uri(FCGX_Request *request);
+
+
 static int
 handle_request(FCGX_Request *request)
 {
-    return 0;
+    int ret;
+    char *uri;
+    
+    ret = -1;
+    uri = FCGX_GetParam("REQUEST_URI", request->envp);
+
+    if (!strncmp(uri, "/lua/", strlen("/lua/"))) {
+        fprintf(stderr, "Lua URI\n");
+        //
+    }
+
+    else if (!strncmp(uri, "/file/", strlen("/file/"))) {
+        ret = handle_file_uri(request);
+    }
+
+    else {
+        fprintf(stderr, "Unrecognized URI: %s\n", uri);
+    }
+
+    return ret;
 }
 
 static void *
@@ -28,15 +51,13 @@ request_thread(void *s_ptr)
     while (1) {
         static pthread_mutex_t accept_mutex = PTHREAD_MUTEX_INITIALIZER;
         static pthread_mutex_t counts_mutex = PTHREAD_MUTEX_INITIALIZER;
+        char *uri;
 
         pthread_mutex_lock(&accept_mutex);
         rc = FCGX_Accept_r(&request);
         pthread_mutex_unlock(&accept_mutex);
 
         handle_request(&request);
-        FCGX_FPrintF(request.out, "\r\n\r\nRequest count: %d (wait...)\n", counter++);
-        sleep(5);
-        FCGX_FPrintF(request.out, "OK");
         FCGX_Finish_r(&request);
     }
 
