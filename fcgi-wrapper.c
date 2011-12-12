@@ -9,7 +9,7 @@
 #define THREAD_COUNT 20
 
 int handle_file_uri(FCGX_Request *request);
-
+int handle_lua_uri(FCGX_Request *request);
 
 static int
 handle_request(FCGX_Request *request)
@@ -21,8 +21,7 @@ handle_request(FCGX_Request *request)
     uri = FCGX_GetParam("REQUEST_URI", request->envp);
 
     if (!strncmp(uri, "/lua/", strlen("/lua/"))) {
-        fprintf(stderr, "Lua URI\n");
-        //
+        ret = handle_lua_uri(request);
     }
 
     else if (!strncmp(uri, "/file/", strlen("/file/"))) {

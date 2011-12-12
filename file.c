@@ -1,6 +1,4 @@
 
-#define PROJECT_DIR "/Users/smc/Sites/dev/luaed/projects"
-
 #include <dirent.h>
 #include <fcgiapp.h>
 #include <stdlib.h>
