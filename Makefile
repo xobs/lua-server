@@ -1,16 +1,15 @@
-CFLAGS ?= -g
-LDFLAGS ?= -lfcgi -lpthread
-LD = gcc
-CC = gcc
+SOURCES=fcgi-wrapper.c file.c
+OBJECTS=$(SOURCES:.c=.o)
+EXEC=fcgi-wrapper
+MY_CFLAGS += -Wall -Werror -O0 -g
+MY_LIBS += -lfcgi -lpthread
 
-all: fcgi-wrapper.o file.o
-	$(LD) $(LDFLAGS) fcgi-wrapper.o file.o -o fcgi-wrapper
-
-fcgi-wrapper.o: fcgi-wrapper.c
-	$(CC) -c $(CFLAGS) fcgi-wrapper.c -o fcgi-wrapper.o
-
-file.o: file.c
-	$(CC) -c $(CFLAGS) file.c -o file.o
+all: $(OBJECTS)
+	$(CC) $(LIBS) $(LDFLAGS) $(OBJECTS) $(MY_LIBS) -o $(EXEC)
 
 clean:
-	rm -f fcgi-wrapper.o file.o fcgi-wrapper
+	rm -f $(EXEC) $(OBJECTS)
+
+.c.o:
+	$(CC) -c $(CFLAGS) $(MY_CFLAGS) $< -o $@
+
